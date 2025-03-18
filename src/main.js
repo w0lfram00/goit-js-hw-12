@@ -27,27 +27,23 @@ async function onSubmit(event) {
       position: 'topRight',
     });
   } else {
-    try {
-      resetGallery();
-      query = form.elements['search-text'].value;
-      pageCount = 1;
-      const resalt = await fetchFromPixabay(query, pageCount);
-      const images = resalt.data.hits;
+    resetGallery();
+    query = form.elements['search-text'].value;
+    pageCount = 1;
+    const data = await fetchFromPixabay(query, pageCount);
+    const images = data.hits;
 
-      loaderStop();
-      if (images.length == 0) {
-        iziToast.error({
-          message: 'No resalt found',
-          position: 'topRight',
-        });
-      } else {
-        renderMoreGallery(images, pageCount);
-        if (resalt.data.totalHits > 15) {
-          showLoadMoreBtn();
-        }
+    loaderStop();
+    if (images.length == 0) {
+      iziToast.error({
+        message: 'No resalt found',
+        position: 'topRight',
+      });
+    } else {
+      renderMoreGallery(images, pageCount);
+      if (data.totalHits > 15) {
+        showLoadMoreBtn();
       }
-    } catch (error) {
-      console.log(error);
     }
     form.reset();
   }
@@ -72,9 +68,8 @@ function hideLoadMoreBtn() {
 
 async function onLoadMoreBtnClick() {
   pageCount++;
-  console.log(pageCount);
-  const resalt = await fetchFromPixabay(query, pageCount);
-  const images = resalt.data.hits;
+  const data = await fetchFromPixabay(query, pageCount);
+  const images = data.hits;
 
   renderMoreGallery(images);
   refs.card = document.querySelector('.gallery-link');
@@ -85,7 +80,7 @@ async function onLoadMoreBtnClick() {
     behavior: 'smooth',
   });
 
-  if (pageCount == Math.ceil(resalt.data.totalHits / 15)) {
+  if (pageCount == Math.ceil(data.totalHits / 15)) {
     iziToast.show({
       message: "We're sorry, but you've reached the end of search results.",
       position: 'topRight',
